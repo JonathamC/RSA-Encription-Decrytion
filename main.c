@@ -12,14 +12,16 @@ int EulerFunc(){
 
 
 int encryption(int message, int n, int e){
-    int y = pow(message, e);
-    return y % n;
+    double y = pow(message, e);
+    long w = y;
+    return w % n;
 }
 
 int decryption(int d, int y, int n){
-    float x = pow(31,7);
-    printf("\n%f", x);
-    return 27512614911 % n;
+    double x = pow(y,d);
+    long v = x;
+
+    return v % n;
 }
 int main(){
     // char userInput[50]; 
@@ -38,6 +40,6 @@ int main(){
     int y = encryption(message, n, e); 
     printf("Encription: %d", y);
     int x = decryption(d,y,n);
-    printf("\nDecription: %d", x);
+    printf("\nDecription: %d\n", x);
     return 0;
 }
