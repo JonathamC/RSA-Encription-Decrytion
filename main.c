@@ -20,7 +20,6 @@ int encryption(int message, int n, int e){
 int decryption(int d, int y, int n){
     double x = pow(y,d);
     long v = x;
-
     return v % n;
 }
 int main(){
