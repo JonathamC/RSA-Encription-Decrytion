@@ -22,8 +22,6 @@ const char* stringToInt(char message[]){
 
 char* substring(char *destination, const char *source, int beg, int n)
 {
-    // extracts `n` characters from the source string starting from `beg` index
-    // and copy them into the destination string
     while (n > 0)
     {
         *destination = *(source + beg);
@@ -32,11 +30,7 @@ char* substring(char *destination, const char *source, int beg, int n)
         source++;
         n--;
     }
- 
-    // null terminate destination string
     *destination = '\0';
- 
-    // return the destination string
     return destination;
 }
 
@@ -58,12 +52,12 @@ char* substring(char *destination, const char *source, int beg, int n)
     return plainText;
 
  }
-int main(){
-    char message[] = "Hi! Let's go to the playground!";
-    const char* cipherText = stringToInt(message);
-    printf("\nCiphertext = %s\n\n", cipherText);
+// int main(){
+//     char message[] = "Hi! Let's go to the playground!";
+//     const char* cipherText = stringToInt(message);
+//     printf("\nCiphertext = %s\n\n", cipherText);
 
-    const char* plainText = intToString(cipherText);
-    printf("\nPlaintext = %s\n", plainText);
-    return 0; 
-}
+//     const char* plainText = intToString(cipherText);
+//     printf("\nPlaintext = %s\n", plainText);
+//     return 0; 
+// }
