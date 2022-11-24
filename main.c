@@ -13,13 +13,13 @@ int EulerFunc(){
 
 int encryption(int message, int n, int e){
     double y = pow(message, e);
-    long w = y;
+    long long int w = y;
     return w % n;
 }
 
 int decryption(int d, int y, int n){
     double x = pow(y,d);
-    long v = x;
+    long long int v = x;
     return v % n;
 }
 int main(){
