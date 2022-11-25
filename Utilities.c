@@ -247,21 +247,21 @@ const char* intToString(char cipherText[]){
 
 
 int main(){
-    // char message[] = "Hi! Let's go to the playground!";
-    // const char* cipherText = stringToInt(message);
-    // printf("\nCiphertext = %s\n\n", cipherText);
+    char message[] = "A top secret!";
+    const char* cipherText = stringToInt(message);
+    printf("\nCiphertext = %s\n\n", cipherText);
 
-    // const char* plainText = intToString(cipherText);
-    // printf("\nPlaintext = %s\n", plainText);
+    const char* plainText = intToString(cipherText);
+    printf("\nPlaintext = %s\n", plainText);
 
-    int p=RNG_prime();
-    Sleep(1000);
-    int q=RNG_prime();
-    int phi=Phi(p,q);
-    int n=p*q;
-    int * arr_e_d =generate_key(n,phi);
-    printf("p: %d q: %d\n",p,q);
-    printf("n: %d phi: %d\n",n,phi);
-    printf("e: %d d:%d \n",arr_e_d[0],arr_e_d[1]);
-    return 0; 
+    // int p=RNG_prime();
+    // Sleep(1000);
+    // int q=RNG_prime();
+    // int phi=Phi(p,q);
+    // int n=p*q;
+    // int * arr_e_d =generate_key(n,phi);
+    // printf("p: %d q: %d\n",p,q);
+    // printf("n: %d phi: %d\n",n,phi);
+    // printf("e: %d d:%d \n",arr_e_d[0],arr_e_d[1]);
+    // return 0; 
 }
