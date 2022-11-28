@@ -40,6 +40,12 @@ int hex_to_ascii(char c, char d){
 
 int main ()
 {
+    // Printing message
+    char message[100];
+    printf("\nEnter message: ");
+    fgets(message, 100, stdin);
+
+
     BN_CTX *ctx = BN_CTX_new();
     
     // Key Generation
@@ -100,13 +106,11 @@ int main ()
 
     
     BN_mod_mul(res, e, d, phi, ctx);
-    printf("(e * d) mod phi = %d\t", BN_is_one(res));
+    printf("(e * d) mod phi = %d --> ", BN_is_one(res));
     printBN("result: ", res);
 
 
-    // Printing message
-    char message[] = "A top secret!";
-    printf("\nOriginal Message = %s\n", message);
+
 
 
     // Encryption step
