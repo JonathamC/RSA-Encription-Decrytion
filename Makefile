@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Werror -Wall -g -std=gnu99
+CFLAGS = -Wall -g -std=gnu99
 LDFLAGS = -lrt -lssl -lcrypto
 TARGET = RSA 
 OBJFILES = RSA.o 
