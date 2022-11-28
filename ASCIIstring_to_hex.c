@@ -17,4 +17,23 @@ int main ()
     BIGNUM *b = BN_new();
     BIGNUM *n = BN_new();
     BIGNUM *res = BN_new();
+
+
+    // Initialize a, b, n
+    BN_generate_prime_ex(a, NBITS, 1, NULL, NULL, NULL);
+    BN_generate_prime_ex(b, NBITS, 1, NULL, NULL, NULL);
+    //BN_dec2bn(&b, "273489463796838501848592769467194369268");
+    BN_rand(n, NBITS, 0, 0);
+
+    printBN("\na = ", a);
+    printBN("b = ", b);
+    // res = a*b
+    BN_mul(res, a, b, ctx);
+    printBN("\na * b = ", res);
+    // res = aˆb mod n
+    BN_mod_exp(res, a, b, n, ctx);
+    printBN("aˆc mod n = ", res);
+    return 0;
 }
+// to compile
+// gcc ASCII_to_Hex.c -o ASCII_to_Hex -I /usr/local/ssl/include -L /usr/local/ssl/lib -lssl -lcrypto -Wall 
