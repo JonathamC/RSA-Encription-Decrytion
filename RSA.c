@@ -115,10 +115,11 @@ int main ()
 
     // Encryption step
     printf("\nEncrypting: \n");
-    printf("\tHexadecimal string = %s\n", stringToHex(message));
+    //printf("\tHexadecimal string = %s\n", stringToHex(message));
     BIGNUM * hexPlaintext = BN_new();
     BN_hex2bn(&hexPlaintext, stringToHex(message));
-    printBN("\tBIGNUM hexPlaintext = ", hexPlaintext);
+    
+    printBN("\thexPlaintext = ", hexPlaintext);
     
     BIGNUM * cipherText = BN_new();
     BN_mod_exp(cipherText, hexPlaintext, e, n, ctx);
@@ -131,7 +132,8 @@ int main ()
     BN_mod_exp(plainText, cipherText, d, n, ctx);
     printBN("\tPlaintext = ", plainText);
     const char * strHexPlaintext = BN_bn2hex(plainText);
-    printf("\tstring representation of hexPlaintext = %s\n", strHexPlaintext);
+    // check if hex to string conversion is correct 
+    //printf("\tstring hexPlaintext = %s\n", strHexPlaintext);
     int length = strlen(strHexPlaintext);
     int i;
     char buf = 0; 
@@ -147,7 +149,7 @@ int main ()
         }
     }
     decryptedMessage[counter] = '\0';
-    printf("\tMessage = %s\n\n", decryptedMessage);
+    printf("\tDecrypted Message = %s\n\n", decryptedMessage);
     return 0;
 }
 // to compile
