@@ -1,155 +1,159 @@
 #include <stdio.h> 
 #include <string.h> 
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
 #include <openssl/bn.h>
 
-#define NBITS 256
-
-int coprime(const BIGNUM *num1, const BIGNUM *num2, BN_CTX *ctx);
-int* generate_key(int n,int phi);
-char encrypt(int plain, int n, int e);
-char decrypt(int cipher,int n, int d);
-const char* intToString(char cipherText[]);
-char* substring(char *destination, const char *source, int beg, int n);
-const char* stringToInt(char message[]);
-int generate_eValue(BIGNUM *phi, BIGNUM * n);
+#define NBITS 1024
 //Anastasia, Jonatham and Ruicheng
 //CP460 Applied Cryptography Project
 
-//Module used for utility functions for RSA 
-//Classes can be used to form attributes such as:
-//Sender info, reciever info, sender/reciever public and private key
-
-
-
-/* 
-Parameters:
-    num1 - integer
-    num2 - integer
-Returns: 
-    found - returns 1 if they are coprime and 0 otherwise*/
-int coprime(const BIGNUM *num1, const BIGNUM *num2, BN_CTX *ctx)  
-{  
-
-    BIGNUM *r= BN_new(); 
-    int gcd = BN_gcd(r, num1, num2, ctx);
-    if (BN_is_one(r) == 1){
-        return 1;
-    }
-    
-    return 0;
+/*
+Generate d values according to e*d mod phi = 1.
+Paramters:
+    r - result pointer 
+    e - e value
+    phi - used to help compute results
+    ctx - BIGNUM temporary variables
+*/
+void generate_private_key(BIGNUM * r, BIGNUM * e, BIGNUM * phi, BN_CTX * ctx){
+    BN_mod_inverse(r, e, phi, ctx);
 }
 
-
 /*
-Generates e and d values according to e*d mod phi = 1
-Paramters:
-    phi - used to help compute results
-    n - p*q
-Returns:
-    arr - array of size 2 [e,d]
+Generate BIGNUM prime key.
+Parameters: 
+    ptr - pointer where result is stored 
+    e - e value 
+    ctx - BIGNUM temporary variables
 */
-int* generate_key(int n,int phi){
-    //e must be less than phi
-    //e must be coprime of n and phi
-    int* arr = (int*)malloc(sizeof(int)*2);
-    // for (int i=2;i<phi;i++){
-    //     if (coprime(i,n) && coprime(i,phi)){
-    //         arr[0]=i;
-    //         break;
-    //     }
-    // }
-
-    int i=1;
-    for (;;){
-        int value=i*arr[0];
-        if (value%phi==1){
-            arr[1]=i;
+void generate_key(BIGNUM *r, BIGNUM * e, BN_CTX * ctx){
+    BIGNUM * temp = BN_new();
+    while (1){
+        BN_generate_prime_ex(r, NBITS / 2, 1, NULL, NULL, NULL);
+        BN_div(NULL, temp, r, e, ctx);
+        if (BN_is_one(temp) == 0){
             break;
         }
-        i++;
     }
-    return arr;
+}
+
+/*
+Calculate Euler Phi value.
+phi = (p-1)(q-1)
+Parameters: 
+    r - result pointer
+    p - BIGNUM prime 
+    q - BIGNUM prime 
+    e - e value 
+    ctx - BIGNUM temporary variables
+*/
+void Euler_Phi(BIGNUM * r, BIGNUM * p, BIGNUM * q, BN_CTX * ctx){
+    //(p-1)
+    BN_sub_word(p,1);
+    //(q-1)
+    BN_sub_word(q,1);
+    //(p-1)(q-1)
+    BN_mul(r, p, q, ctx);
+    //(p+1)
+    BN_add_word(p,1);
+    //(q+1)
+    BN_add_word(q,1);
+}
+
+/*
+Convert string to hexidecimal.
+Parameters: 
+    message - character string
+Return: 
+    hexStr - String of hexidecimal corresponding to message
+*/
+const char* stringToHex(char message[]){
+    char* hexStr= (char*)malloc(sizeof(char)*1000); 
+    int i, j = 0; 
+
+    for (i = 0; i < strlen(message); i++){
+        sprintf(hexStr + j, "%02X", message[i]);
+        j += 2;
+    }
+    hexStr[j] = '\0';
+
+    return hexStr;
 }
 
 
 /*
-Parameters:
-    plain - string as plain text
-Returns:
-    output - string as cipher text
+Convert hexidecimal to ASCII integer.
+Parameters: 
+    c - char array of hexidecimal
+Return: 
+    result - ASCII integer 
 */
-char encrypt(int plain, int n, int e){
-    // double y=pow(plain,e);
-    // long w=y;
-    // return w%n;
-    return 'c';
+int hex_to_int(char c){
+    int first = c / 16 - 3;
+    int second = c % 16;
+    int result = first*10 + second;
+    if(result > 9) result--;
+    return result;
 }
 
 /*
-Parameters:
-    cipher - string as cipher text
-Returns:
-    output - string as plain text
+Convert hexidecimal to ASCII character.
+Parameters: 
+    c - used to calculate high bound
+    d - used to calculate low bound
+Return: 
+    result - high + low
 */
-char decrypt(int cipher,int n, int d){
-    //double x=pow(cipher, d);
-    return 'c';
+int hex_to_ascii(char c, char d){
+    int high = hex_to_int(c) * 16;
+    int low = hex_to_int(d);
+    return high+low;
 }
 
 
-const char* stringToInt(char message[]){
-    int lenMessage = strlen(message) * 3; 
-    char* cipherText= (int*)malloc(sizeof(int)*lenMessage); 
+/*
+Encryption. 
+Parameters:
+    hexPlaintext - hexidecimal of plaintext 
+    cipherText - ptr for where ciphertext will be stored
+    message - char array of ASCII character from user
+    e - e value
+    n - p * q
+    ctx - BIGNUM temporary variables 
+*/
+void encrypt(BIGNUM *  hexPlaintext, BIGNUM * cipherText, char message[], BIGNUM * e, BIGNUM * n, BN_CTX * ctx){
+    BN_hex2bn(&hexPlaintext, stringToHex(message));
+    BN_mod_exp(cipherText, hexPlaintext, e, n, ctx);
+}
 
+/*
+Decryption. 
+Parameters:
+    strHexPlaintext - hexidecimal in string form.
+Returns:
+    message - decrypted message from ciphertext.
+*/
+const char * decrypt(const char * strHexPlaintext){
+    int length = strlen(strHexPlaintext);
+    int i;
+    char buf = 0; 
     int counter = 0;
-    for (int i = 0 ; i < strlen(message); i ++){
-        char temp[4] = {'\0'}; 
-        sprintf(temp, "%03d", (int)message[i]);
-        printf("%c %d\t%s\n", message[i], (int)message[i], temp);
-        for (int i = 0; i < strlen(temp); i++){
-            cipherText[counter] = temp[i];
+    char * message = (char*)malloc(sizeof(char)*100);
+    for (i = 0; i < length; i++){
+        if (i % 2 != 0){
+            message[counter] = hex_to_ascii(buf, strHexPlaintext[i]);
             counter++;
         }
+        else {
+            buf = strHexPlaintext[i];
+        }
     }
-    cipherText[counter] = '\0';
-    return cipherText;
+    message[counter] = '\0';
+    return message;
 }
 
-char* substring(char *destination, const char *source, int beg, int n)
-{
-    while (n > 0)
-    {
-        *destination = *(source + beg);
- 
-        destination++;
-        source++;
-        n--;
-    }
-    *destination = '\0';
-    return destination;
-}
 
-const char* intToString(char cipherText[]){
-    int lenCipher = strlen(cipherText) / 3;
-    char* plainText= (int*)malloc(sizeof(int)*lenCipher);
-    int counter = 0; 
 
-    for (int i = 0 ; i < strlen(cipherText) ; i = i+3){
-        char temp[4] = {'\0'};
-        substring(temp, cipherText, i, 3);
-        printf("%s\t", temp);
-        int x = atoi(temp);
-        printf("%c\n",(char)x);
-        plainText[counter] = (char)x;
-        counter++;
-    }
-    plainText[counter] = '\0';
-    return plainText;
 
- }
 
 void printBN(char *msg, BIGNUM * a)
 {
@@ -160,68 +164,4 @@ void printBN(char *msg, BIGNUM * a)
     OPENSSL_free(number_str);
 }
 
-int generate_eValue(BIGNUM *phi, BIGNUM * n){
-    
 
-    return 0;
-}
-
-
-int main(){
-    // char message[] = "A top secret!";
-    // const char* cipherText = stringToInt(message);
-    // printf("\nCiphertext = %s\n\n", cipherText);
-
-    // const char* plainText = intToString(cipherText);
-    // printf("\nPlaintext = %s\n", plainText);
-
-    BN_CTX *ctx = BN_CTX_new();
-    BIGNUM *p = BN_new();
-    BIGNUM *q = BN_new();
-    BIGNUM *n = BN_new();
-    BIGNUM *res = BN_new();
-
-
-    // Initialize a, b, n
-    BN_generate_prime_ex(p, NBITS, 1, NULL, NULL, NULL);
-    BN_generate_prime_ex(q, NBITS, 1, NULL, NULL, NULL);
-    // n = p * q
-    BN_mul(n, p, q, ctx);
-
-    // Calculating Phi 
-    BIGNUM *phi = BN_new();
-    //(p-1)
-    BN_sub_word(p,1);
-    //(q-1)
-    BN_sub_word(q,1);
-    //(p-1)(q-1)
-    BN_mul(phi, p, q, ctx);
-    BN_add_word(p,1);
-    BN_add_word(q,1);
-
-    printBN("p = ", p);
-    printBN("q = ", q);
-    printBN("n = ", n);
-    printBN("phi = ", phi);
-    // res = aˆb mod n
-    // BN_mod_exp(res, a, b, n, ctx);
-
-    // int eValues[] = {"65537", "257", "17", "5", "3"};
-    BIGNUM *e = BN_new(); 
-    BN_dec2bn(&e, "65537");
-    printBN("\ndec2bn of e = ", e);
-
-    BIGNUM * d = BN_new(); 
-    BN_mod_inverse(d, e, phi, ctx);
-    printBN("d = ", d);
-
-    BN_mod_exp(res, e, d, phi, ctx);
-    printBN("result: ", res);
-    printf("%d", BN_is_one(res));
-}
-
-// to compile
-// gcc ASCII_to_Hex.c -o ASCII_to_Hex -I /usr/local/ssl/include -L /usr/local/ssl/lib -lssl -lcrypto -Wall
-
-// res = aˆb mod n
-// BN_mod_exp(res, a, b, n, ctx);
