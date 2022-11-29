@@ -13,10 +13,8 @@ int main ()
     printf("\nEnter message: ");
     fgets(message, 1000, stdin);
 
-
-    
-    
     // Key Generation
+    // Generate e 
     BIGNUM *e = BN_new(); 
     BN_dec2bn(&e, "65537");
     printBN("\ne = ", e);
@@ -26,13 +24,11 @@ int main ()
     generate_key(p, e, ctx);
     printBN("p = ", p); 
     
-
     // Generate q 
     BIGNUM *q = BN_new(); 
     generate_key(q, e, ctx);
     printBN("q = ", q); 
     
-
     // Generate n = pq
     BIGNUM *n = BN_new();
     BN_mul(n, p, q, ctx);
@@ -56,7 +52,6 @@ int main ()
     printBN("\thexPlaintext = ", hexPlaintext);
     printBN("\tCiphertext = ", cipherText);
 
-
     // Decryption Step
     printf("\nDecrypting: \n");
     BIGNUM * plainText = BN_new(); 
@@ -67,5 +62,3 @@ int main ()
     printf("\tDecrypted Message = %s\n\n", decryptedMessage);
     return 0;
 }
-// to compile
-// gcc RSA.c -o RSA -I /usr/local/ssl/include -L /usr/local/ssl/lib -lssl -lcrypto -Wall 
