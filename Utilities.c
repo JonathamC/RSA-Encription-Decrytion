@@ -16,6 +16,9 @@ Paramters:
 */
 
 void generate_private_key(BIGNUM * r, BIGNUM * e, BIGNUM * phi, BN_CTX * ctx){
+    // performing inverse mod to find d
+    // r * e mod phi = 1 
+    // return r (d)
     BN_mod_inverse(r, e, phi, ctx);
 }
 
@@ -29,8 +32,12 @@ Parameters:
 void generate_key(BIGNUM *r, BIGNUM * e, BN_CTX * ctx){
     BIGNUM * temp = BN_new();
     while (1){
+        // generates a pseudo-random prime number of NBITS/2 length
         BN_generate_prime_ex(r, NBITS / 2, 1, NULL, NULL, NULL);
+        // BN_div with first parameter set to NULL corresponds as mod function
+        // perform r % e and store results in temp
         BN_div(NULL, temp, r, e, ctx);
+        // check if r % e == 1 if yes (0) break while loop
         if (BN_is_one(temp) == 0){
             break;
         }
@@ -68,6 +75,7 @@ Return:
     hexStr - String of hexidecimal corresponding to message
 */
 const char* stringToHex(char message[]){
+    // initialize hexStr and allocate for length 1000 
     char* hexStr= (char*)malloc(sizeof(char)*1000); 
     int i, j = 0; 
 
@@ -75,6 +83,7 @@ const char* stringToHex(char message[]){
         sprintf(hexStr + j, "%02X", message[i]);
         j += 2;
     }
+    // indicate end of string
     hexStr[j] = '\0';
 
     return hexStr;
@@ -122,7 +131,10 @@ Parameters:
     ctx - BIGNUM temporary variables 
 */
 void encrypt(BIGNUM *  hexPlaintext, BIGNUM * cipherText, char message[], BIGNUM * e, BIGNUM * n, BN_CTX * ctx){
+    // converting to hexadecimal string to BN
     BN_hex2bn(&hexPlaintext, stringToHex(message));
+    // perform encryption 
+    // hexPlaintext ^ e mod n and store in cipherText 
     BN_mod_exp(cipherText, hexPlaintext, e, n, ctx);
 }
 
