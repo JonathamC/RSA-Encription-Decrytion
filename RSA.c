@@ -3,6 +3,9 @@
 #include <string.h>
 #include "Utilities.c"
 
+//Anastasia, Jonatham and Ruicheng
+//CP460 Applied Cryptography Project
+
 
 int main ()
 {
@@ -55,10 +58,7 @@ int main ()
     // Decryption Step
     printf("\nDecrypting: \n");
     BIGNUM * plainText = BN_new(); 
-    BN_mod_exp(plainText, cipherText, d, n, ctx);
-    printBN("\tPlaintext = ", plainText);
-    const char * strHexPlaintext = BN_bn2hex(plainText);
-    const char * decryptedMessage = decrypt(strHexPlaintext);
+    const char * decryptedMessage = decrypt(plainText, cipherText, d, n, ctx);
     printf("\tDecrypted Message = %s\n\n", decryptedMessage);
     return 0;
 }

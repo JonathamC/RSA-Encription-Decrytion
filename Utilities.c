@@ -3,8 +3,18 @@
 #include <openssl/bn.h>
 
 #define NBITS 1024
+
 //Anastasia, Jonatham and Ruicheng
 //CP460 Applied Cryptography Project
+
+void printBN(char *msg, BIGNUM * a)
+{
+/* Use BN_bn2hex(a) for hex string
+* Use BN_bn2dec(a) for decimal string */
+    char * number_str = BN_bn2hex(a);
+    printf("%s %s\n", msg, number_str);
+    OPENSSL_free(number_str);
+}
 
 /*
 Generate d values according to e*d mod phi = 1.
@@ -25,11 +35,11 @@ void generate_private_key(BIGNUM * r, BIGNUM * e, BIGNUM * phi, BN_CTX * ctx){
 /*
 Generate BIGNUM prime key.
 Parameters: 
-    ptr - pointer where result is stored 
+    r - pointer where result is stored 
     e - e value 
     ctx - BIGNUM temporary variables
 */
-void generate_key(BIGNUM *r, BIGNUM * e, BN_CTX * ctx){
+void generate_key(BIGNUM * r, BIGNUM * e, BN_CTX * ctx){
     BIGNUM * temp = BN_new();
     while (1){
         // generates a pseudo-random prime number of NBITS/2 length
@@ -145,11 +155,18 @@ Parameters:
 Returns:
     message - decrypted message from ciphertext.
 */
-const char * decrypt(const char * strHexPlaintext){
+const char * decrypt(BIGNUM * plainText, BIGNUM * cipherText, BIGNUM * d, BIGNUM * n, BN_CTX * ctx){
+    // perform cipherText ^ d mod n 
+    // store in plainText (hexadecimal)
+    BN_mod_exp(plainText, cipherText, d, n, ctx);
+    printBN("\tPlaintext = ", plainText);
+    // convert hexadecimal to string hexadecimal
+    const char * strHexPlaintext = BN_bn2hex(plainText);
     int length = strlen(strHexPlaintext);
     int i;
     char buf = 0; 
     int counter = 0;
+    // initializing message of size 100 chars
     char * message = (char*)malloc(sizeof(char)*100);
     for (i = 0; i < length; i++){
         if (i % 2 != 0){
@@ -168,13 +185,5 @@ const char * decrypt(const char * strHexPlaintext){
 
 
 
-void printBN(char *msg, BIGNUM * a)
-{
-/* Use BN_bn2hex(a) for hex string
-* Use BN_bn2dec(a) for decimal string */
-    char * number_str = BN_bn2hex(a);
-    printf("%s %s\n", msg, number_str);
-    OPENSSL_free(number_str);
-}
 
 
