@@ -14,6 +14,7 @@ Paramters:
     phi - used to help compute results
     ctx - BIGNUM temporary variables
 */
+
 void generate_private_key(BIGNUM * r, BIGNUM * e, BIGNUM * phi, BN_CTX * ctx){
     BN_mod_inverse(r, e, phi, ctx);
 }
