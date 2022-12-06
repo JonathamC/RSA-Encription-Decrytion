@@ -4,3 +4,5 @@ vcpkg/
 *.exe
 RSA
 RSA
+*.json
+*.json
