@@ -33,7 +33,7 @@ void generate_private_key(BIGNUM * r, BIGNUM * e, BIGNUM * phi, BN_CTX * ctx){
 }
 
 /*
-Generate BIGNUM prime key.
+Generate a random BIGNUM of bit length NBITS/2 where NBITS is the required bit length. 
 Parameters: 
     r - pointer where result is stored 
     e - e value 
@@ -151,7 +151,11 @@ void encrypt(BIGNUM *  hexPlaintext, BIGNUM * cipherText, char message[], BIGNUM
 /*
 Decryption. 
 Parameters:
-    strHexPlaintext - hexidecimal in string form.
+    plainText - decrypted text string in hexadecimal
+    cipherText - encrypted text string in hexadecimal
+    d - Private key.
+    n - p * q
+    ctx - BIGNUM temporary variables
 Returns:
     message - decrypted message from ciphertext.
 */

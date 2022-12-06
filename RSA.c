@@ -18,6 +18,7 @@ int main ()
 
     // Key Generation
     // Generate e 
+    // Select a value of e from  3,5,17,257,65537
     BIGNUM *e = BN_new(); 
     BN_dec2bn(&e, "65537");
     printBN("\ne = ", e);
